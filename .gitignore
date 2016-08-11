@@ -125,3 +125,6 @@ local.properties
 *.ipr
 *.ids
 *.orig
+
+# DB
+db.sqlite3
