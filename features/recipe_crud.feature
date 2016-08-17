@@ -5,7 +5,8 @@ Feature: CRUD of recipes
   Scenario: List recipes
     When making the get request to the url '/api/recipes/'
     Then status is 200 OK
-    And result size is 11
+    And result size in page is 10
+    And total result in page is 11
 
   Scenario: Create recipe without authentication
     Given  with the default recipe

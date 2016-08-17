@@ -1,6 +1,9 @@
+from collections import OrderedDict
+
 from behave import *
 from django.contrib.auth.models import User
 from rest_framework import status
+from rest_framework.pagination import LimitOffsetPagination
 
 use_step_matcher("parse")
 
@@ -69,8 +72,14 @@ def compare_key_with_value(context, key, value):
     context.test.assertEqual(context.response.data[key], value)
 
 
-@then("result size is {size:d}")
-def compare_result_size(context, size):
-    if not isinstance(context.response.data, list):
-        raise ValueError("The result not is a list")
-    context.test.assertEqual(len(context.response.data), size)
+@then("result size in page is {size:d}")
+def compare_page_size(context, size):
+    contain_key(context, 'results')
+    context.test.assertEqual(len(context.response.data['results']), size)
+
+
+@then("total result in page is {size:d}")
+def compare_page_total_row(context, size):
+    contain_key(context, 'count')
+    context.test.assertEqual(context.response.data['count'], size)
+
