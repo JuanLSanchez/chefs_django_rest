@@ -1,0 +1,126 @@
+###########
+## Users ##
+###########
+- model: auth.User
+  pk: 1
+  fields:
+    first_name: Admin
+    last_name: User
+    username: admin
+    is_active: 1
+    is_staff: 1
+    is_superuser: 1
+    password: "pbkdf2_sha256$24000$6DOU2a65kAjT$9VW0zaUl1DfkqVnRS/wZLcl+tB9IHgvTHXRadYeJY+4="
+
+- model: auth.User
+  pk: 2
+  fields:
+    first_name: Juan Luis
+    last_name: User
+    username: juanlu
+    is_active: 1
+    is_staff: 1
+    password: "pbkdf2_sha256$24000$6DOU2a65kAjT$9VW0zaUl1DfkqVnRS/wZLcl+tB9IHgvTHXRadYeJY+4="
+
+- model: auth.User
+  pk: 3
+  fields:
+    first_name: Default
+    last_name: User
+    username: default
+    is_active: 1
+    is_staff: 1
+    password: "pbkdf2_sha256$24000$6DOU2a65kAjT$9VW0zaUl1DfkqVnRS/wZLcl+tB9IHgvTHXRadYeJY+4="
+
+#############
+## Recipes ##
+#############
+
+- model: api.Recipe
+  pk: 1
+  fields:
+    name: Recipe00
+    description: Description Recipe00
+    created: 2016-08-15 13:01:56.784734+00:00
+    updated: 2016-08-15 13:10:56.784734+00:00
+    owner: 2
+- model: api.Recipe
+  pk: 2
+  fields:
+    name: Recipe01
+    description: Description Recipe01
+    created: 2016-08-1 13:01:56.784734+00:00
+    updated: 2016-08-2 13:10:56.784734+00:00
+    owner: 2
+- model: api.Recipe
+  pk: 3
+  fields:
+    name: Recipe02
+    description: Description Recipe02
+    created: 2016-06-15 13:01:56.784734+00:00
+    updated: 2016-07-15 13:10:56.784734+00:00
+    owner: 3
+- model: api.Recipe
+  pk: 4
+  fields:
+    name: Recipe03
+    description: Description Recipe03
+    created: 2016-06-30 13:01:56.784734+00:00
+    updated: 2016-07-1 13:10:56.784734+00:00
+    owner: 2
+- model: api.Recipe
+  pk: 5
+  fields:
+    name: Recipe04
+    description: Description Recipe04
+    created: 2016-08-11 13:01:56.784734+00:00
+    updated: 2016-08-11 18:10:56.784734+00:00
+    owner: 3
+- model: api.Recipe
+  pk: 6
+  fields:
+    name: Recipe06
+    description: Description Recipe06
+    created: 2016-08-15 10:01:56.784734+00:00
+    updated: 2016-08-15 12:10:56.784734+00:00
+    owner: 2
+- model: api.Recipe
+  pk: 7
+  fields:
+    name: Recipe07
+    description: Description Recipe07
+    created: 2016-08-01 3:01:56.784734+00:00
+    updated: 2016-08-02 3:10:56.784734+00:00
+    owner: 2
+- model: api.Recipe
+  pk: 8
+  fields:
+    name: Recipe08
+    description: Description Recipe08
+    created: 2016-06-01 13:01:56.784734+00:00
+    updated: 2016-07-01 13:10:56.784734+00:00
+    owner: 3
+- model: api.Recipe
+  pk: 9
+  fields:
+    name: Recipe09
+    description: Description Recipe03
+    created: 2016-06-30 13:01:56.784734+00:00
+    updated: 2016-07-1 13:10:56.784734+00:00
+    owner: 2
+- model: api.Recipe
+  pk: 10
+  fields:
+    name: Recipe10
+    description: Description Recipe10
+    created: 2015-08-11 13:01:56.784734+00:00
+    updated: 2015-08-11 18:10:56.784734+00:00
+    owner: 3
+- model: api.Recipe
+  pk: 11
+  fields:
+    name: Recipe11
+    description: Description Recipe11
+    created: 2015-12-11 13:01:56.784734+00:00
+    updated: 2015-12-11 18:10:56.784734+00:00
+    owner: 3
