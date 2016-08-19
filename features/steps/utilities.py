@@ -1,9 +1,6 @@
-from collections import OrderedDict
-
 from behave import *
 from django.contrib.auth.models import User
 from rest_framework import status
-from rest_framework.pagination import LimitOffsetPagination
 
 use_step_matcher("parse")
 
@@ -15,12 +12,13 @@ def load_fixture(context, fixture):
 
 
 # Authentication ----------------------------------------------------------
-@step("as any user")
-def step_impl(context):
+@step("like any user")
+def like_any_user(context):
     users = User.objects.all()
     if not users:
         raise ValueError("Users list empty!!")
-    context.client.force_authenticate(user=users[0])
+    user = users[0]
+    login_user(context, user)
 
 
 # Creating request ----------------------------------------------------------
@@ -31,8 +29,38 @@ def get_request(context, url):
 
 
 @when("making the post request to the url '{url}' with the body {body}")
-def step_impl(context, url, body):
+def post_request(context, url, body):
     response = context.client.post(url, context.body[body], format='json')
+    context.response = response
+
+
+@when("making the put request to the url '{url}' with the attribute '{attribute}' and the body '{body}'")
+def put_request(context, url, attribute, body):
+    if not (hasattr(context, 'body') and body in context.body):
+        raise ValueError("The body not contain the object %s" % body)
+    if attribute not in context.body[body]:
+        raise ValueError("The object not contain the attribute %s" % attribute)
+    object_id = str(context.body[body][attribute])
+    url_with_id = url + str(object_id) + '/'
+    response = context.client.put(url_with_id, context.body[body],
+                                  format='json')
+    context.response = response
+
+
+@when(
+    "making the put request to the url '{url}' with the attribute "
+    "as id '{attribute}' of '{body_id}' and the body '{body}'")
+def put_request_with_other_id(context, url, attribute, body_id, body):
+    if not (hasattr(context, 'body') and body_id in context.body):
+        raise ValueError("The body not contain the object %s" % body_id)
+    if not (hasattr(context, 'body') and body in context.body):
+        raise ValueError("The body not contain the object %s" % body)
+    if attribute not in context.body[body_id]:
+        raise ValueError("The object not contain the attribute %s" % attribute)
+    object_id = str(context.body[body_id][attribute])
+    url_with_id = url + str(object_id) + '/'
+    response = context.client.put(url_with_id, context.body[body],
+                                  format='json')
     context.response = response
 
 
@@ -53,8 +81,26 @@ def check_status_is_201(context):
 
 
 @then("status is 403 FORBIDDEN")
-def check_status_is_401(context):
+def check_status_is_403(context):
     check_status(context, status.HTTP_403_FORBIDDEN)
+
+
+# Modify object -------------------------------------------------------------------
+@when("modify the string attribute '{attribute_name}' of the object body '{object_name}' by '{value}'")
+def modify_attribute_value(context, attribute_name, object_name, value):
+    if not (hasattr(context, 'body') and object_name in context.body):
+        raise ValueError("The body not contain the object %s" % object_name)
+    if attribute_name not in context.body[object_name]:
+        raise ValueError("The object not contain the attribute %s" % attribute_name)
+    context.body[object_name][attribute_name] = value
+
+
+@when("modify the '{attribute}' id of the object body '{body}' by the principal id")
+def step_impl(context, attribute, body):
+    if not hasattr(context, 'user'):
+        raise ValueError("Not found authenticated user")
+    value = context.user.id
+    modify_attribute_value(context, attribute, body, value)
 
 
 # Check object ---------------------------------------------------------------------
@@ -62,7 +108,7 @@ def check_status_is_401(context):
 def contain_key(context, key):
     if not hasattr(context.response, 'data'):
         raise ValueError("Not contain data")
-    elif not key in context.response.data:
+    elif key not in context.response.data:
         raise ValueError("Not contain key: %s" % key)
 
 
@@ -83,3 +129,19 @@ def compare_page_total_row(context, size):
     contain_key(context, 'count')
     context.test.assertEqual(context.response.data['count'], size)
 
+
+# Auxiliary methods ------------------------------------------------------------------------
+def add_to_body(context, object_body, object_name):
+    if hasattr(context, 'body'):
+        context.body[object_name] = object_body
+    else:
+        context.body = {object_name: object_body}
+
+
+def add_to_body_with_serializer(context, object_body, object_name, serializer):
+    add_to_body(context, serializer(object_body).data, object_name)
+
+
+def login_user(context, user):
+    context.client.force_authenticate(user=user)
+    context.user = user
