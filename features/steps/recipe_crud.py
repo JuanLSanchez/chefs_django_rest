@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 from api.models import Recipe
 from api.serializers import RecipeSerializer
-from features.steps.utilities import login_user, add_to_body, add_to_body_with_serializer
+from features.steps.utilities import login_user, add_to_body, add_to_body_with_serializer, add_to_variables
 
 use_step_matcher("parse")
 
@@ -59,3 +59,16 @@ def step_impl(context, id):
     if not recipes:
         raise ValueError("Not found recipes of other user")
     add_to_body_with_serializer(context, recipes[0], id, RecipeSerializer)
+
+
+@step("save the number of recipe of the owner of '{object_name}' in '{variable}'")
+def count_recipes_of_owner(context, object_name, variable):
+    attribute_name = 'id'
+    if not (hasattr(context, 'body') and object_name in context.body):
+        raise ValueError("The body not contain the object %s" % object_name)
+    if attribute_name not in context.body[object_name]:
+        raise ValueError("The object not contain the attribute %s" % attribute_name)
+    add_to_variables(context, variable,
+                     len(Recipe.objects.all()
+                         .filter(owner=Recipe.objects
+                                 .get(id=context.body[object_name][attribute_name]).owner)))

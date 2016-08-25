@@ -95,12 +95,34 @@ def modify_attribute_value(context, attribute_name, object_name, value):
     context.body[object_name][attribute_name] = value
 
 
+@when("modify the attribute '{attribute_name}' of the object body '{object_name}' "
+      "by the attribute of object '{object_name_second}'")
+def exchange_attribute_value(context, attribute_name, object_name, object_name_second):
+    if not (hasattr(context, 'body') and object_name in context.body):
+        raise ValueError("The body not contain the object %s" % object_name)
+    if object_name_second not in context.body:
+        raise ValueError("The body not contain the object %s" % object_name)
+    if attribute_name not in context.body[object_name] or attribute_name not in context.body[object_name_second]:
+        raise ValueError("The object not contain the attribute %s" % attribute_name)
+    context.body[object_name][attribute_name] = context.body[object_name_second][attribute_name]
+
+
 @when("modify the '{attribute}' id of the object body '{body}' by the principal id")
 def step_impl(context, attribute, body):
     if not hasattr(context, 'user'):
         raise ValueError("Not found authenticated user")
     value = context.user.id
     modify_attribute_value(context, attribute, body, value)
+
+
+# Check variables ---------------------------------------------------------------
+@then("the '{variable1}' variable is equals to th '{variable2}' variable")
+def step_impl(context, variable1, variable2):
+    if not (hasattr(context, 'variable') and variable1 in context.variable):
+        raise ValueError("Not contain the variable %s" % variable1)
+    if variable2 not in context.variable:
+        raise ValueError("Not contain the variable %s" % variable2)
+    context.test.assertEqual(context.variable[variable1], context.variable[variable2])
 
 
 # Check object ---------------------------------------------------------------------
@@ -112,10 +134,20 @@ def contain_key(context, key):
         raise ValueError("Not contain key: %s" % key)
 
 
-@then('the "{key}" attribute is equal to "{value}"')
+@then("the '{key}' attribute is equal to '{value}'")
 def compare_key_with_value(context, key, value):
     contain_key(context, key)
     context.test.assertEqual(context.response.data[key], value)
+
+
+@then("the '{key}' attribute is equals to the '{attribute_name}' attribute of the '{object_name}' object")
+def step_impl(context, key, attribute_name, object_name):
+    if not (hasattr(context, 'body') and object_name in context.body):
+        raise ValueError("The body not contain the object %s" % object_name)
+    if attribute_name not in context.body[object_name]:
+        raise ValueError("The object not contain the attribute %s" % attribute_name)
+    context.test.assertEqual(context.response.data[key],
+                             context.body[object_name][attribute_name])
 
 
 @then("result size in page is {size:d}")
@@ -131,6 +163,13 @@ def compare_page_total_row(context, size):
 
 
 # Auxiliary methods ------------------------------------------------------------------------
+def add_to_variables(context, variable, value):
+    if hasattr(context, 'variable'):
+        context.variable[variable] = value
+    else:
+        context.variable = {variable: value}
+
+
 def add_to_body(context, object_body, object_name):
     if hasattr(context, 'body'):
         context.body[object_name] = object_body
