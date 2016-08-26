@@ -8,6 +8,10 @@ Feature: CRUD of recipes
     And result size in page is 10
     And total result in page is 11
 
+  Scenario: Details of one recipe
+    When making the get request to the url '/api/recipes/1/'
+    Then status is 200 OK
+
   Scenario: Create recipe without authentication
     Given  with the default recipe as 'recipe'
     When making the post request to the url '/api/recipes/' with the body recipe
@@ -56,3 +60,19 @@ Feature: CRUD of recipes
     When modify the string attribute 'id' of the object body 'recipe' by 'Test Name'
     And making the put request to the url '/api/recipes/' with the attribute as id 'id' of 'recipe1' and the body 'recipe'
     Then status code is 400
+
+  Scenario: Delete a recipe without authentication
+    When making the delete request to the url '/api/recipes/1/'
+    Then status is 403 FORBIDDEN
+
+  Scenario: Delete a recipe with the owner
+    Given like a user with recipes
+    And with any recipe of the user as 'recipe'
+    When making the delete request with object, to the url '/api/recipes/' with the 'id' of the object 'recipe'
+    Then status is 204 NOT CONTENT
+
+  Scenario: Delete a recipe with other owner
+    Given like a user with recipes
+    And with any recipe of other user as 'recipe'
+    When making the delete request with object, to the url '/api/recipes/' with the 'id' of the object 'recipe'
+    Then status is 403 FORBIDDEN

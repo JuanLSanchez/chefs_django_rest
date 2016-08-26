@@ -64,6 +64,22 @@ def put_request_with_other_id(context, url, attribute, body_id, body):
     context.response = response
 
 
+@when("making the delete request to the url '{url}'")
+def step_impl(context, url):
+    response = context.client.delete(url, format='json')
+    context.response = response
+
+
+@when("making the delete request with object, to the url '{url}' with the '{attribute}' of the object '{body}'")
+def step_impl(context, url, attribute, body):
+    if not (hasattr(context, 'body') and body in context.body):
+        raise ValueError("The body not contain the object %s" % body)
+    if attribute not in context.body[body]:
+        raise ValueError("The object not contain the attribute %s" % attribute)
+    response = context.client.delete(url + str(context.body[body][attribute]) + '/', format='json')
+    context.response = response
+
+
 # Check Status ----------------------------------------------------------
 @then("status code is {status_code:d}")
 def check_status(context, status_code):
@@ -83,6 +99,11 @@ def check_status_is_201(context):
 @then("status is 403 FORBIDDEN")
 def check_status_is_403(context):
     check_status(context, status.HTTP_403_FORBIDDEN)
+
+
+@then("status is 204 NOT CONTENT")
+def step_impl(context):
+    check_status(context, status.HTTP_204_NO_CONTENT)
 
 
 # Modify object -------------------------------------------------------------------
