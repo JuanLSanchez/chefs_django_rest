@@ -1,2 +1,4 @@
 django==1.9.8
 djangorestframework==3.4.1
+behave-django
+pyyaml
